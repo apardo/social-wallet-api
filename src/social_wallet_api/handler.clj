@@ -120,7 +120,7 @@
 
    ;; TODO: make sure APIKEYS created and stored when available
    ;; TODO is this per conneciton or per API instance?
-   (when (read-string (:apikey config))
+   #_(when (read-string (:apikey config))
      (create-and-store-apikey currency))
    
    (when-let [fair-conf (get-connection-conf config app-name :faircoin)]
