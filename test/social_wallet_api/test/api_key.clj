@@ -18,17 +18,6 @@
 ;; You should have received a copy of the GNU Affero General Public License
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-(ns social-wallet-api.api-key
-  (:require [taoensso.timbre :as log]
-            [fxc.core :as fxc]
-            [failjure.core :as f]
-            [freecoin-lib.db.api-key :as ak]))
-
-(defn- generate-apikey [length]
-  (fxc/generate length))
-
-(defn create-and-store-apikey [client-app length]
-  (f/if-let-ok? [apikey-entry (ak/create-apikey! client-app (generate-apikey length))]
-    apikey-entry
-    (f/fail (str "Could not create api-key entry because: " apikey-entry))))
-
+(ns social-wallet-api.test.api-key
+  (:require [midje.sweet :refer :all]
+            [social-wallet-api.api-key :as ak]))
