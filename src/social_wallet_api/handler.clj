@@ -43,7 +43,7 @@
             [dom-top.core :as dom]
             [ring.middleware.cors :refer [wrap-cors]]
             [clj-time.core :as time]
-            [social-wallet-api.api-key :refer [create-and-store-apikey]]))
+            [social-wallet-api.api-key :refer [create-and-store-apikey!]]))
 
 (defonce prod-app-name "social-wallet-api")
 (defonce config-default (config-read prod-app-name))

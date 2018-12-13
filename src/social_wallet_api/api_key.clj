@@ -27,8 +27,10 @@
 (defn- generate-apikey [length]
   (fxc/generate length))
 
-(defn create-and-store-apikey [client-app length]
-  (f/if-let-ok? [apikey-entry (ak/create-apikey! client-app (generate-apikey length))]
+(defn create-and-store-apikey! [apikey-store client-app length]
+  (f/if-let-ok? [apikey-entry (f/try* (ak/create-apikey! {:apikey-store apikey-store
+                                                          :client-app client-app
+                                                          :api-key (generate-apikey length)}))]
     apikey-entry
     (f/fail (str "Could not create api-key entry because: " apikey-entry))))
 
