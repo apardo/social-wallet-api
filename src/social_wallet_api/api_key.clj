@@ -24,6 +24,8 @@
             [failjure.core :as f]
             [freecoin-lib.db.api-key :as ak]))
 
+(defonce apikey (atom ""))
+
 (defn- generate-apikey [length]
   (fxc/generate length))
 
@@ -34,3 +36,5 @@
     apikey-entry
     (f/fail (str "Could not create api-key entry because: " apikey-entry))))
 
+(defn apikey? [apikey-store client-app]
+  (ak/fetch-by-client-app apikey-store client-app))
