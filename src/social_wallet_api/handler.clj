@@ -195,6 +195,16 @@
                                                       :currency (:connection query)))))))
              blockchain-transactions)))
 
+(defn wrap-auth [handler]
+  (fn [request]
+    (if (log/spy @client)
+      (if (= (or (-> request :headers (get "X-API-Key"))
+                 (-> request :headers (get "x-api-key")))
+             (log/spy (get @apikey @client)))
+        (handler request)
+        (unauthorized {:error "Could not access the Social Wallet API"}))
+      (handler request))))
+
 (def rest-api
   (api
     {:swagger
@@ -207,19 +217,21 @@
               :contact {:url "https://github.com/Commonfare-net/social-wallet-api"}}}}}
 
     (context (path-with-version "") []
-             :tags ["INFO"]
-             (GET "/readme" request
-                  {:headers {"Content-Type"
-                             "text/html; charset=utf-8"}
-                   :body {:readme (md/md-to-html-string
-                                   (slurp "README.md"))}}))
+      :tags ["INFO"]
+      (GET "/readme" request
+        {:headers {"Content-Type"
+                   "text/html; charset=utf-8"}
+         :body {:readme (md/md-to-html-string
+                         (slurp "README.md"))}}))
 
     (context (path-with-version "") []
       :tags ["LABEL"]
+      :middleware [wrap-auth]
       (POST "/label" request
         :responses {status/not-found {:schema {:error s/Str}}
                     status/service-unavailable {:schema {:error s/Str}}}
         :return Label
+        :header-params [x-api-key]
         :body [query Query]
         :summary "Show the label"
         :description "
@@ -552,8 +564,7 @@ Returns the DB entries that were created.
       (handler request))))
 
 (def app
-  (wrap-auth
-   (wrap-cors
-    (wrap-defaults rest-api rest-api-defaults)
-    :access-control-allow-origin [#".*"]
-    :access-control-allow-methods [:get :post])))
+  (wrap-cors
+   (wrap-defaults rest-api rest-api-defaults)
+   :access-control-allow-origin [#".*"]
+   :access-control-allow-methods [:get :post]))
